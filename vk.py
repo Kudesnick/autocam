@@ -8,10 +8,18 @@ from getpass import getpass
 import vk_api
 from vk_api import VkUpload
 
-user = input('input user name (mail):')
-password = getpass('input password:')
+user = ''
+password = ''
+owner_id = ''
 
-owner_id = '-194929390' # club194929390
+# user     = input('input user name (mail):')
+# password = getpass('input password:')
+# owner_id = '-194929390' # club194929390
+
+with open('vk_config_auth', 'r') as f:
+    user = f.readline().strip('\r\n \t')
+    password = f.readline().strip('\r\n \t')
+    owner_id = f.readline().strip('\r\n \t')
 
 def auth_handler():
     key = input("Enter authentication code: ")
@@ -27,7 +35,7 @@ vk = vk_session.get_api()
 
 upload = VkUpload(vk_session)
 
-photos = ['m.jpg', 'm1.jpg']
+photos = sys.argv[1:]
 photo_list = upload.photo_wall(photos)
 attachment = ','.join('photo{owner_id}_{id}'.format(**item) for item in photo_list)
 
