@@ -1,0 +1,15 @@
+# pip3 install gpiozero pigpio
+# pip3 install RPi.GPIO
+
+# apt install pigpio
+# pigpiod
+
+$ pinout
+
+; Монтируем флешку (по метке диска - CAM_SD)
+# mount -L CAM_SD /media
+$ ls /media/DCIM/100MSDCF
+; _DSC????.JPG
+# umount /media
+
+тестовая группа: club194929390
