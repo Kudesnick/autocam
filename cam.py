@@ -3,6 +3,7 @@ from time import sleep
 from sh import mount
 from sh import umount
 import os
+import subprocess
 
 cam_pwr = 16
 cam_pre = 20
@@ -22,13 +23,24 @@ if True:
     GPIO.setup([cam_pre, cam_push], GPIO.IN)
     sleep(5)
     GPIO.setup(usb_pwr, GPIO.OUT, initial = GPIO.LOW)
-    sleep(5)
-    print("Here must be loaded image to the internet.")
+    sleep(15)
+
     mount('LABEL=CAM_SD', '/media')
     sleep(1)
-    for name in os.listdir('/media/DCIM/100MSDCF'):
-        print(name)
+    
+    mnt_path = '/media/DCIM/100MSDCF'
+    cmd = ['python3', 'vk.py']
+    for name in os.listdir(mnt_path):
+        cmd.append(mnt_path + '/' + name)
+
+    print('Send to server..')
+    subprocess.run(cmd)
+
+    for name in os.listdir(mnt_path):
+        os.remove(mnt_path + '/' + name)
+    
     umount('/media')
+
     GPIO.setup([cam_pwr, usb_pwr], GPIO.IN)
     sleep(3)
 
