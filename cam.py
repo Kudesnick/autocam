@@ -1,6 +1,10 @@
-import os
+from time import sleep
+import subprocess
+from pathlib import Path
 
-is_debug = os.path.exists('debug')
+import vk
+
+is_debug = Path('debug').exists()
 
 if is_debug:
     print('Run in debug mode.')
@@ -11,9 +15,6 @@ if not is_debug:
     import RPi.GPIO as GPIO
     from sh import mount
     from sh import umount
-
-from time import sleep
-import subprocess
 
 cam_pwr = 16
 cam_pre = 20
@@ -28,6 +29,7 @@ def cam_pwr_on():
     GPIO.setmode(GPIO.BCM)
     GPIO.setup([cam_pwr, cam_pre, cam_push, usb_pwr], GPIO.IN)
     GPIO.setup(cam_pwr, GPIO.OUT, initial = GPIO.LOW)
+    sleep(2)
 
 def cam_pwr_off():
     if is_debug:
@@ -47,6 +49,7 @@ def cam_push_btn():
     GPIO.setup(cam_push, GPIO.OUT, initial = GPIO.LOW)
     sleep(0.2)
     GPIO.setup([cam_pre, cam_push], GPIO.IN)
+    sleep(20)
 
 def cam_disc_mount():
     if is_debug:
@@ -65,28 +68,24 @@ def cam_disc_unmount():
     umount('/media')
     GPIO.setup(usb_pwr, GPIO.IN)
 
-def add_path_to_vk(_path: str, _del_after = False: bool):
-    cmd = ['python3', 'vk.py']
-    for name in os.listdir(_path):
-        cmd.append(_path + '/' + name)
+def add_path_to_vk(_path: str, _del_after: bool = False):
+    files = list()
+    for name in Path(_path).glob('*.JP*'):
+        files.append(str(name))
 
     print('Send to server..')
-    subprocess.run(cmd)
+    vk.main(files)
 
     if _del_after:
-        for name in os.listdir(_path):
-            os.remove(_path + '/' + name)
-
-exit(0)
+        for name in Path(_path).glob('*'):
+            name.unlink()
 
 try:
     cam_pwr_on()
-    sleep(5)
     cam_push_btn()
-    sleep(20)
     
     cam_disc_mount()
-    if is_debug
+    if is_debug:
         add_path_to_vk('dbg_files', False)
     else:
         add_path_to_vk('/media/DCIM/100MSDCF', True)

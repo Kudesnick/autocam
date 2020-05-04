@@ -27,24 +27,28 @@ def auth_handler():
 
     return key, remember_device
 
-vk_session = vk_api.VkApi(user, password, auth_handler = auth_handler)
-#vk_session = vk_api.VkApi(user, password)
-vk_session.auth()
+def main(_files: list):
+    vk_session = vk_api.VkApi(user, password, auth_handler = auth_handler)
+    #vk_session = vk_api.VkApi(user, password)
+    vk_session.auth()
 
-vk = vk_session.get_api()
+    vk = vk_session.get_api()
 
-upload = VkUpload(vk_session)
+    upload = VkUpload(vk_session)
 
-photos = sys.argv[1:]
-photo_list = upload.photo_wall(photos)
-attachment = ','.join('photo{owner_id}_{id}'.format(**item) for item in photo_list)
+    for i in range(0, len(_files), 10): # 10 - VK limit on post attachments
 
-result = vk.wall.post(
-    owner_id = owner_id,
-    from_group = 1,
-    message = '#timetolookatthesky',
-    attachments = attachment
-    )
+        photo_list = upload.photo_wall(_files[i : i + 9])
+        attachment = ','.join('photo{owner_id}_{id}'.format(**item) for item in photo_list)
 
-print(result)
-print('Ok')
+        result = vk.wall.post(
+            owner_id = owner_id,
+            from_group = 1,
+            message = '#timetolookatthesky',
+            attachments = attachment
+            )
+
+        print(result)
+
+if __name__ == "__main__":
+    main(sys.argv[1:])
