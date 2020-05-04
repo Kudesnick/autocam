@@ -42,7 +42,7 @@ attachment = ','.join('photo{owner_id}_{id}'.format(**item) for item in photo_li
 result = vk.wall.post(
     owner_id = owner_id,
     from_group = 1,
-    message = '#timetolookinthesky',
+    message = '#timetolookatthesky',
     attachments = attachment
     )
 
