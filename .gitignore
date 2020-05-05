@@ -1,1 +1,5 @@
 vk_config*
+debug
+dbg_files/
+.vscode
+__pycache__
