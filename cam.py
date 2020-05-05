@@ -119,5 +119,8 @@ def main(_send_msg: bool = False):
         print('Complete.')
 
 if __name__ == "__main__":
-    main(True)
-#   main(len(sys.argv) > 1 and sys.argv[1] == 'send')
+    if is_debug:
+        send = input('Send files to server? (y/n): ') == 'y'
+        main(send)
+    else:
+        main(len(sys.argv) > 1 and sys.argv[1] == 'send')
