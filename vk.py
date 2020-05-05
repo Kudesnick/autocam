@@ -29,14 +29,13 @@ def auth_handler():
 
 def main(_files: list):
     vk_session = vk_api.VkApi(user, password, auth_handler = auth_handler)
-    #vk_session = vk_api.VkApi(user, password)
     vk_session.auth()
 
     vk = vk_session.get_api()
 
     upload = VkUpload(vk_session)
 
-    for i in range(0, len(_files), 10): # 10 - VK limit on post attachments
+    for i in range(0, len(_files), 9): # 10 - VK limit on post attachments
 
         photo_list = upload.photo_wall(_files[i : i + 9])
         attachment = ','.join('photo{owner_id}_{id}'.format(**item) for item in photo_list)

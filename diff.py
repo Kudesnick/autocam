@@ -34,15 +34,16 @@ def CompareHash(hash1, hash2):
         i=i+1
     return count
 
-last_hash = None
-files = list()
-for name in Path('dbg_files').glob('*.JP*'):
-    hash_tmp, light_tmp = CalcImageHash(str(name), 32, 32)
-    if light_tmp > 35:
-        if last_hash == None or CompareHash(last_hash, hash_tmp) > 150:
-            last_hash = hash_tmp
-            files.append(str(name.stem))
+if __name__ == "__main__":
+    last_hash = None
+    files = list()
+    for name in Path('dbg_files').glob('*.JP*'):
+        hash_tmp, light_tmp = CalcImageHash(str(name), 32, 32)
+        if light_tmp > 35:
+            if last_hash == None or CompareHash(last_hash, hash_tmp) > 150:
+                last_hash = hash_tmp
+                files.append(str(name.stem))
 
-print(files)
+    print(files)
 
-print('Ok')
+    print('Complete diff test.')
