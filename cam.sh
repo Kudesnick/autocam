@@ -1,9 +1,10 @@
 #!/bin/bash
 
+printf 'Autocam starting..'
 if  [ $(date +"%M") == 0 ] && [ $[$(date +"%H") % 2] == 1 ]
 then
-    printf 'sudo python3 cam.py send\r\n'
+    sudo python3 cam.py send
 else
-    printf 'sudo python3 cam.py\r\n'
+    sudo python3 cam.py
 fi
-date +"%H:%M"
+printf 'Autocam finished.'
