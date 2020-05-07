@@ -94,6 +94,36 @@ def add_path_to_vk(_path: str, _send: bool = False):
     # delete files if too similar <-
 
     if _send:
+
+        max_img_nums = 7 # maximum images to sending
+        if (len(files) > max_img_nums):
+            print('Thinning images..')
+            hashes = []
+            diff_sum = []
+            for f in files:
+                tmp, _ = diff.CalcImageHash(f, 32, 32)
+                hashes.append(tmp)
+            for h1 in hashes:
+                sum_tmp = 0
+                for h2 in hashes:
+                    sum_tmp += diff.CompareHash(h1, h2)
+                diff_sum.append(sum_tmp)
+
+            neighbor_index = len(diff_sum) * 0.7
+            for k in range(len(diff_sum) - 1):
+                diff_sum[k] += diff.CompareHash(hashes[k], hashes[k+1]) * neighbor_index
+            diff_sum[-1] += diff.CompareHash(hashes[-1], hashes[0]) * neighbor_index
+            
+            sorted_dict = dict(zip(diff_sum, files))
+            to_remove = sorted(sorted_dict)[:-max_img_nums]
+            for k in to_remove:
+                f_path = Path(sorted_dict[k])
+                if is_debug:
+                    f_path.rename(f_path.with_suffix('.back'))
+                else:
+                    f_path.unlink()
+                files.remove(sorted_dict[k])
+
         print('Send to server..')
         vk.main(files)
         if not is_debug:
