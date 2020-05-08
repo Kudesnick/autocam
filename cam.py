@@ -91,6 +91,7 @@ def add_path_to_vk(_path: str, _send: bool = False):
             f_path.rename(f_path.with_suffix('.back'))
         else:
             f_path.unlink()
+        files.pop()
     # delete files if too similar <-
 
     if _send:
