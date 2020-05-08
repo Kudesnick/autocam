@@ -1,10 +1,21 @@
 #!/bin/bash
 
-printf 'Autocam starting..'
-if  [ $(date +"%M") == 0 ] && [ $[$(date +"%H") % 2] == 1 ]
+cd ~/autocam
+
+if  [ $[$(date +"%M") +  0] == 0 ] && [ $[$(date +"%H") %  2] == 0 ]
 then
-    sudo python3 cam.py send
-else
-    sudo python3 cam.py
+    printf 'Repo update..'
+    git pull
+    printf 'Repo update complete.'
 fi
-printf 'Autocam finished.'
+
+if  [ $[$(date +"%M") +  0] == 0 ] && [ $[$(date +"%H") %  2] == 0 ]
+then
+    printf 'Autocam send starting..'
+    sudo python3 cam.py send
+    printf 'Autocam finished.'
+elif [ $[$(date +"%M") % 10] == 0 ] && [ $[$(date +"%H") %  1] == 0 ]
+    printf 'Autocam starting..'
+    sudo python3 cam.py
+    printf 'Autocam finished.'
+fi
