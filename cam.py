@@ -86,12 +86,11 @@ def add_path_to_vk(_path: str, _send: bool = False):
     # dirty hack for detect if not added new files
     elif last_hash == '' or diff.CompareHash(last_hash, new_hash) != 0:
         # files is too similar or darkness
-        f_path = Path(files[-1])
+        f_path = Path(files.pop())
         if is_debug:
             f_path.rename(f_path.with_suffix('.back'))
         else:
             f_path.unlink()
-        files.pop()
     # delete files if too similar <-
 
     if _send:
@@ -99,31 +98,19 @@ def add_path_to_vk(_path: str, _send: bool = False):
         max_img_nums = 7 # maximum images to sending
         if (len(files) > max_img_nums):
             print('Thinning images..')
-            hashes = []
-            diff_sum = []
+            divers_sum = []
             for f in files:
                 tmp, _ = diff.CalcImageHash(f, 32, 32)
-                hashes.append(tmp)
-            for h1 in hashes:
-                sum_tmp = 0
-                for h2 in hashes:
-                    sum_tmp += diff.CompareHash(h1, h2)
-                diff_sum.append(sum_tmp)
+                divers_sum.append((diff.DiversityHash(tmp), f))
 
-            neighbor_index = len(diff_sum) * 0.7
-            for k in range(len(diff_sum) - 1):
-                diff_sum[k] += diff.CompareHash(hashes[k], hashes[k+1]) * neighbor_index
-            diff_sum[-1] += diff.CompareHash(hashes[-1], hashes[0]) * neighbor_index
-            
-            sorted_dict = dict(zip(diff_sum, files))
-            to_remove = sorted(sorted_dict)[:-max_img_nums]
-            for k in to_remove:
-                f_path = Path(sorted_dict[k])
+            to_remove = sorted(divers_sum)[:-max_img_nums]
+            for f in to_remove:
+                f_path = Path(f[1])
                 if is_debug:
                     f_path.rename(f_path.with_suffix('.back'))
                 else:
                     f_path.unlink()
-                files.remove(sorted_dict[k])
+                files.remove(f[1])
 
         print('Send to server..')
         vk.main(files)

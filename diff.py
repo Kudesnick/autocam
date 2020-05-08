@@ -23,7 +23,16 @@ def CalcImageHash(FileName, x_size = 16, y_size = 16):
                 _hash=_hash+"0"
             
     return _hash, avg
- 
+
+def DiversityHash(hash: str):
+    last = hash[0]
+    result = 0 if last == hash[-1] else 1
+    for i in hash[1:]:
+        if last != i:
+            result += 1
+        last = i
+    return result
+
 def CompareHash(hash1, hash2):
     l=len(hash1)
     i=0
