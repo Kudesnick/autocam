@@ -10,7 +10,7 @@ if  [ $[$(date +"%M") +  0] == 0 ] && [ $[$(date +"%H") %  2] == 0 ]; then
     printf 'Repo update complete.\r\n'
 fi
 
-if   [ $[$(date +"%M") +  0] == 0 ] && [ $[$(date +"%H") % 12] == 0 ]; then
+if   [ $[$(date +"%M") +  0] == 0 ] && [ $[$(date +"%H") %  4] == 0 ]; then
     printf 'Autocam send and sync starting..\r\n'
     python3 cam.py --send --sync
     printf 'Autocam finished.\r\n'
