@@ -56,7 +56,7 @@ def cam_disc_mount():
     GPIO.setup(usb_pwr, GPIO.OUT, initial = GPIO.LOW)
     sleep(10)
 
-def cam_disc_unmount():
+def cam_disc_umount():
     global is_debug
     if is_debug:
         print('Debug: cam_disc_unmount')
@@ -70,7 +70,7 @@ def files_first_rename(_path: str, _cloud_only: bool):
     new_files = [name for name in Path(_path).glob('*.JPG')]
     suffix = '.jpg' if _cloud_only else '.jpeg'
     for name in new_files:
-        name.rename(Path(name.parent, hex(int(datetime.utcnow().timestamp())) + name.stem + '.jpeg'))
+        name.rename(Path(name.parent, hex(int(datetime.utcnow().timestamp())) + name.stem + suffix))
 
 def add_path_to_vk(_path: str, _send: bool):
     global is_debug
@@ -126,13 +126,21 @@ def main(_send_msg: bool = False, _cloud_only: bool = False, _cloud_sync: bool =
         cam_push_btn()
         cam_disc_mount()
         img_path = '/media/DCIM/100MSDCF' if not is_debug else 'dbg_files'
+        for _ in range(3):
+            if Path(img_path).is_dir():
+                print('SD CARD mounted.')
+                break
+            else:
+                sleep(5)
+        else:
+            print('Error! SD CARD not mounted!')
         files_first_rename(img_path, _cloud_only)
         if not _cloud_only:
             add_path_to_vk(img_path, _send_msg)
         if _cloud_sync:
             add_to_cloud(img_path)
     finally:
-        cam_disc_unmount()
+        cam_disc_umount()
         cam_pwr_off()
 
         print('Complete.')
