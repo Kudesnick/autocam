@@ -2,6 +2,7 @@
 
 import sys
 from time import sleep
+from datetime import datetime
 import subprocess
 from pathlib import Path
 import vk
@@ -66,12 +67,18 @@ def cam_disc_unmount():
     umount('/media')
     GPIO.setup(usb_pwr, GPIO.IN)
 
-def add_path_to_vk(_path: str, _send: bool = False):
-    global is_debug
-    files = list()
-    for name in Path(_path).glob('*.JP*'):
-        files.append(str(name))
+def delete_file(_path: Path):
+    _path.rename(_path.with_suffix('.jpg'))
 
+def files_first_rename(_path: str, _cloud_only: bool):
+    new_files = [name for name in Path(_path).glob('*.JPG')]
+    suffix = '.jpg' if _cloud_only else '.jpeg'
+    for name in new_files:
+        name.rename(Path(name.parent, hex(int(datetime.utcnow().timestamp())) + name.stem + '.jpeg'))
+
+def add_path_to_vk(_path: str, _send: bool):
+    global is_debug
+    files = [str(name) for name in Path(_path).glob('*.jpeg')]
     if len(files) < 1:
         return
 
@@ -86,11 +93,7 @@ def add_path_to_vk(_path: str, _send: bool = False):
     # dirty hack for detect if not added new files
     elif last_hash == '' or diff.CompareHash(last_hash, new_hash) != 0:
         # files is too similar or darkness
-        f_path = Path(files.pop())
-        if is_debug:
-            f_path.rename(f_path.with_suffix('.back'))
-        else:
-            f_path.unlink()
+        delete_file(Path(files.pop()))
     # delete files if too similar <-
 
     if _send:
@@ -105,20 +108,18 @@ def add_path_to_vk(_path: str, _send: bool = False):
 
             to_remove = sorted(divers_sum)[:-max_img_nums]
             for f in to_remove:
-                f_path = Path(f[1])
-                if is_debug:
-                    f_path.rename(f_path.with_suffix('.back'))
-                else:
-                    f_path.unlink()
+                delete_file(Path(f[1]))
                 files.remove(f[1])
 
         print('Send to server..')
         vk.main(files)
-        if not is_debug:
-            for name in Path(_path).glob('*.JP*'):
-                name.unlink()
+        for name in Path(_path).glob('*.jpeg'):
+            delete_file(name)
 
-def main(_send_msg: bool = False):
+def add_to_cloud(_path: str):
+    subprocess.run(['rclone', 'copy', _path, 'cloud-mailru:/autocam_imgs', '--filter', '*.jpg'])
+
+def main(_send_msg: bool = False, _cloud_only: bool = False, _cloud_sync: bool = False):
     global is_debug
     if is_debug:
         print('Run in debug mode.')
@@ -129,7 +130,11 @@ def main(_send_msg: bool = False):
         cam_push_btn()
         cam_disc_mount()
         img_path = '/media/DCIM/100MSDCF' if not is_debug else 'dbg_files'
-        add_path_to_vk(img_path, _send_msg)
+        files_first_rename(img_path, _cloud_only)
+        if not _cloud_only:
+            add_path_to_vk(img_path, _send_msg)
+        if _cloud_sync:
+            add_to_cloud(img_path)
     finally:
         cam_disc_unmount()
         cam_pwr_off()
@@ -141,4 +146,5 @@ if __name__ == "__main__":
         send = input('Send files to server? (y/n): ') == 'y'
         main(send)
     else:
-        main(len(sys.argv) > 1 and sys.argv[1] == 'send')
+        params = sys.argv[1:]
+        main(params.count('--send') > 0, params.count('--cloud') > 0, params.count('--sync') > 0)
