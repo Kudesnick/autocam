@@ -12,8 +12,6 @@ is_debug = Path('debug').exists()
 
 if not is_debug:
     import RPi.GPIO as GPIO
-    from sh import mount
-    from sh import umount
 
 cam_pwr = 16
 cam_pre = 20
@@ -56,15 +54,13 @@ def cam_disc_mount():
         print('Debug: cam_disc_mount')
         return
     GPIO.setup(usb_pwr, GPIO.OUT, initial = GPIO.LOW)
-    sleep(5)
-    mount('LABEL=CAM_SD', '/media')
+    sleep(10)
 
 def cam_disc_unmount():
     global is_debug
     if is_debug:
         print('Debug: cam_disc_unmount')
         return
-    umount('/media')
     GPIO.setup(usb_pwr, GPIO.IN)
 
 def delete_file(_path: Path):
