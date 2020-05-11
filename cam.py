@@ -17,6 +17,7 @@ cam_pwr = 16
 cam_pre = 20
 cam_push = 21
 usb_pwr = 12
+relay = 18
 
 def cam_pwr_on():
     global is_debug
@@ -24,8 +25,8 @@ def cam_pwr_on():
         print('Debug: cam_pwr_on')
         return
     GPIO.setmode(GPIO.BCM)
-    GPIO.setup([cam_pwr, cam_pre, cam_push, usb_pwr], GPIO.IN)
-    GPIO.setup(cam_pwr, GPIO.OUT, initial = GPIO.LOW)
+    GPIO.setup([cam_pre, cam_push, usb_pwr], GPIO.IN)
+    GPIO.setup([cam_pwr, relay], GPIO.OUT, initial = GPIO.LOW)
     sleep(2)
 
 def cam_pwr_off():
@@ -41,12 +42,15 @@ def cam_push_btn():
     if is_debug:
         print('Debug: cam_push')
         return
+    GPIO.setup(relay, GPIO.OUT, initial = GPIO.HIGH)
     GPIO.setup(cam_pre, GPIO.OUT, initial = GPIO.LOW)
     sleep(0.2)
     GPIO.setup(cam_push, GPIO.OUT, initial = GPIO.LOW)
     sleep(0.2)
     GPIO.setup([cam_pre, cam_push], GPIO.IN)
-    sleep(20)
+    sleep(10)
+    GPIO.setup(relay, GPIO.OUT, initial = GPIO.LOW)
+    sleep(10)
 
 def cam_disc_mount():
     global is_debug
