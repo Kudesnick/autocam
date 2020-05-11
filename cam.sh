@@ -25,7 +25,7 @@ elif [ $(($M % 10)) == 0 ] && [ $(($H %  1)) == 0 ]; then
     printf 'Autocam starting..\r\n'
     python3 cam.py
     printf 'Autocam finished.\r\n'
-elif [ $(($M +  5)) == 0 ] && [ $(($H %  1)) == 0 ]; then
+elif [ $(($M %  5)) == 0 ] && [ $(($H %  1)) == 0 ]; then
     printf 'Autocam for cloud only starting..\r\n'
     python3 cam.py --cloud
     printf 'Autocam finished.\r\n'
