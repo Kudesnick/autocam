@@ -113,7 +113,7 @@ def add_path_to_vk(_path: str, _send: bool):
             delete_file(name)
 
 def add_to_cloud(_path: str):
-    subprocess.run(['rclone', 'copy', _path, 'cloud-mailru:/autocam_imgs', '--filter', '*.jpg'])
+    subprocess.run(['rclone', 'move', _path, 'cloud-mailru:/autocam_imgs', '--include', '*.jpg'])
 
 def main(_send_msg: bool = False, _cloud_only: bool = False, _cloud_sync: bool = False):
     global is_debug
