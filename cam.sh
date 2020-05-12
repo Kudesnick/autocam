@@ -1,5 +1,31 @@
 #!/bin/bash
 
+# lock execute other instance of this script
+lock_file=/var/lock/$(basename $0).lock
+
+echo $lock_file
+
+lock_waiting=50
+lock_repeat=5
+
+while [ $lock_waiting > 0 ]; do
+    lock_waiting=$[ $lock_waiting - $lock_repeat ]
+    
+    if fuser $lock_file > /dev/null 2>&1; then
+        sleep $lock_repeat
+    else
+        break
+    fi
+
+    if [ $lock_waiting -le 0 ]; then
+        echo 'WARNING: Other instance of $(basename $0) running.'
+        exit 1
+    fi
+done
+
+exec 3> $lock_file
+
+# main functional
 cd /home/pi/autocam
 
 date
@@ -7,26 +33,28 @@ date
 M=$(date +'%-M')
 H=$(date +'%-H')
 
-if   [ $(($M +  0)) == 0 ] && [ $(($H %  2)) == 0 ]; then
-    printf 'Repo update..\r\n'
-    git pull
-    printf 'Repo update complete.\r\n'
+# run cam.py in the desired mode
+if   [ $(($M +  0)) == 0 ] && [ $(($H %  4)) == 0 ]; then
+    echo 'Autocam send and sync starting..'
+    python3 cam.py --send --sync
+    echo 'Autocam finished.'
+elif [ $(($M +  0)) == 0 ] && [ $(($H %  2)) == 0 ]; then
+    echo 'Autocam send starting..'
+    python3 cam.py --send
+    echo 'Autocam finished.'
+elif [ $(($M % 10)) == 0 ] && [ $(($H %  1)) == 0 ]; then
+    echo 'Autocam starting..'
+    python3 cam.py
+    echo 'Autocam finished.'
+elif [ $(($M %  5)) == 0 ] && [ $(($H %  1)) == 0 ]; then
+    echo 'Autocam for cloud only starting..'
+    python3 cam.py --cloud
+    echo 'Autocam finished.'
 fi
 
-if   [ $(($M +  0)) == 0 ] && [ $(($H %  4)) == 0 ]; then
-    printf 'Autocam send and sync starting..\r\n'
-    python3 cam.py --send --sync
-    printf 'Autocam finished.\r\n'
-elif [ $(($M +  0)) == 0 ] && [ $(($H %  2)) == 0 ]; then
-    printf 'Autocam send starting..\r\n'
-    python3 cam.py --send
-    printf 'Autocam finished.\r\n'
-elif [ $(($M % 10)) == 0 ] && [ $(($H %  1)) == 0 ]; then
-    printf 'Autocam starting..\r\n'
-    python3 cam.py
-    printf 'Autocam finished.\r\n'
-elif [ $(($M %  5)) == 0 ] && [ $(($H %  1)) == 0 ]; then
-    printf 'Autocam for cloud only starting..\r\n'
-    python3 cam.py --cloud
-    printf 'Autocam finished.\r\n'
+# repo update
+if   [ $(($M +  0)) == 0 ] && [ $(($H %  2)) == 0 ]; then
+    echo 'Repo update..'
+    git pull
+    echo 'Repo update complete.'
 fi
