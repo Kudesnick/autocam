@@ -53,7 +53,7 @@ elif [ $(($M %  5)) == 0 ] && [ $(($H %  1)) == 0 ]; then
 fi
 
 # repo update
-if   [ $(($M +  0)) == 0 ] && [ $(($H %  2)) == 0 ]; then
+if   [ $(($M % 30)) == 0 ] && [ $(($H %  1)) == 0 ]; then
     echo 'Repo update..'
     git pull
     echo 'Repo update complete.'
