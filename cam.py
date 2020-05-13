@@ -23,11 +23,15 @@ def cam_pwr_on():
     global is_debug
     if is_debug:
         print('Debug: cam_pwr_on')
-        return
+        return True
     GPIO.setmode(GPIO.BCM)
-    GPIO.setup([cam_pre, cam_push, usb_pwr], GPIO.IN)
-    GPIO.setup([cam_pwr, relay], GPIO.OUT, initial = GPIO.LOW)
+    GPIO.setup([cam_pwr, cam_pre, cam_push, usb_pwr], GPIO.IN)
+    if not GPIO.input(cam_pwr):
+        return False
+    GPIO.setup([cam_pwr], GPIO.OUT, initial = GPIO.LOW)
+    GPIO.setup([relay], GPIO.OUT, initial = GPIO.HIGH)
     sleep(2)
+    return True
 
 def cam_pwr_off():
     global is_debug
@@ -126,7 +130,9 @@ def main(_send_msg: bool = False, _cloud_only: bool = False, _cloud_sync: bool =
     else:
         print('Run in release mode.')
     try:
-        cam_pwr_on()
+        if not cam_pwr_on():
+            print('Error. Camera is power-on in manual mode.')
+            exit(1)
         cam_push_btn()
         cam_disc_mount()
         img_path = '/media/DCIM/100MSDCF' if not is_debug else 'dbg_files'
