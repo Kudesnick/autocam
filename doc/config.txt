@@ -62,7 +62,7 @@ dtoverlay=i2c-rtc,ds3231,wakeup-source
 enable_uart=1
 # Enable USB UART console
 # if uncomment this parameter then add parameter 'modules-load=dwc2,g_serial' into cmdline.txt after parameter 'rootwait'
-# dtoverlay=dwc2
+dtoverlay=dwc2
 
 [pi4]
 # Enable DRM VC4 V3D driver on top of the dispmanx display stack

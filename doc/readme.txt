@@ -51,6 +51,7 @@ FS_MOUNTOPTIONS=""
 PrivateMounts=yes
 ; to
 PrivateMounts=no
+; warning! this option must be autoreset after upgrade system
 
 тестовая группа: club194929390
 
@@ -78,3 +79,14 @@ PrivateMounts=no
 
 ; установка rclone
 $ curl https://rclone.org/install.sh | sudo bash
+
+; работа с i2c
+# sudo raspi-config
+Interfacing Options -> I2C -> YES
+# apt install i2c-tools
+# i2cdetect -y 1
+# i2cdump -y -f -r 0-15 1 0x68
+# nano /etc/modules
+; add 'rtc-ds3231' string to this file and reboot system
+# hwclock --set --date "2005/01/12 23:24:25"
+# hwclock --show --verbose
