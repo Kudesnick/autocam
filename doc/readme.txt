@@ -40,7 +40,7 @@ $ ls /media/DCIM/100MSDCF
 # apt install usbmount
 # nano /etc/fstab
 ; add string:
-/dev/sda1 /media auto defaults,sync,user,nofail,rw,umask=0000 0 0
+/dev/sda1 /media auto defaults,noatime,sync,user,nofail,rw,umask=0000 0 0
 # nano /etc/usbmount/usbmount.conf
 ; replase variables to:
 MOUNTPOINTS="/media"
