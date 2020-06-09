@@ -142,7 +142,10 @@ def main(_send_msg: bool = False, _cloud_only: bool = False, _cloud_sync: bool =
 
         mnt = False
         for i in range(100, 1000):
-            img_path = '/media/DCIM/{i}MSDCF'.format(str(i)) if not is_debug else 'dbg_files'
+            r_path = '/media/DCIM/{}MSDCF'.format(str(i))
+            if is_debug:
+                print('Real img path: {}'.format(r_path))
+            img_path = r_path if not is_debug else 'dbg_files'
 
             if not mnt:
                 for _ in range(3):
