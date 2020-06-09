@@ -77,8 +77,11 @@ def delete_file(_path: Path):
 def files_first_rename(_path: str, _cloud_only: bool):
     new_files = [name for name in Path(_path).glob('*.JPG')]
     suffix = '.jpg' if _cloud_only else '.jpeg'
-    for name in new_files:
+    if (len(new_files) == 1):
         name.rename(Path(name.parent, hex(int(datetime.utcnow().timestamp())) + name.stem + suffix))
+    else:
+        for name in new_files:
+            name.rename(Path(name.parent, hex(int(name.stat().st_ctime)) + name.stem + suffix))
 
 def add_path_to_vk(_path: str, _send: bool):
     global is_debug
