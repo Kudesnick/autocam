@@ -124,6 +124,7 @@ def add_path_to_vk(_path: str, _send: bool):
             delete_file(name)
 
 def add_to_cloud(_path: str):
+    _cloud_path = 'cloud-mailru:/autocam_imgs' if not is_debug else 'cloud-mailru:/autocam_imgs_test'
     subprocess.run(['rclone', 'move', _path, 'cloud-mailru:/autocam_imgs', '--include *.jpg', '--max-transfer 200M'])
 
 def main(_send_msg: bool = False, _cloud_only: bool = False, _cloud_sync: bool = False):
@@ -138,20 +139,32 @@ def main(_send_msg: bool = False, _cloud_only: bool = False, _cloud_sync: bool =
             exit(1)
         cam_push_btn()
         cam_disc_mount()
-        img_path = '/media/DCIM/100MSDCF' if not is_debug else 'dbg_files'
-        for _ in range(3):
-            if Path(img_path).is_dir():
-                print('SD CARD mounted.')
+
+        mnt = False
+        for i in range(100, 1000):
+            img_path = '/media/DCIM/{i}MSDCF'.format(str(i)) if not is_debug else 'dbg_files'
+
+            if not mnt:
+                for _ in range(3):
+                    if Path(img_path).is_dir():
+                        mnt = True
+                        print('SD CARD mounted.')
+                        break
+                    else:
+                        sleep(5)
+                else:
+                    print('Error! SD CARD not mounted!')
+                    break
+            elif not Path(img_path).is_dir():
                 break
-            else:
-                sleep(5)
-        else:
-            print('Error! SD CARD not mounted!')
-        files_first_rename(img_path, _cloud_only)
-        if not _cloud_only:
-            add_path_to_vk(img_path, _send_msg)
-        if _cloud_sync:
-            add_to_cloud(img_path)
+
+            files_first_rename(img_path, _cloud_only)
+            if not _cloud_only:
+                add_path_to_vk(img_path, _send_msg)
+            if _cloud_sync:
+                add_to_cloud(img_path)
+
+            if is_debug: break
     finally:
         cam_disc_umount()
         cam_pwr_off()
