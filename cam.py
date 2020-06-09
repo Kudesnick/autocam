@@ -78,7 +78,7 @@ def files_first_rename(_path: str, _cloud_only: bool):
     new_files = [name for name in Path(_path).glob('*.JPG')]
     suffix = '.jpg' if _cloud_only else '.jpeg'
     if (len(new_files) == 1):
-        name.rename(Path(name.parent, hex(int(datetime.utcnow().timestamp())) + name.stem + suffix))
+        new_files[0].rename(Path(new_files[0].parent, hex(int(datetime.utcnow().timestamp())) + new_files[0].stem + suffix))
     else:
         for name in new_files:
             name.rename(Path(name.parent, hex(int(name.stat().st_ctime)) + name.stem + suffix))
@@ -90,7 +90,7 @@ def add_path_to_vk(_path: str, _send: bool):
         return
 
     # delete files if too similar ->
-    hash_file = Path(_path).joinpath('hash')
+    hash_file = Path(_path).joinpath('..').joinpath('hash')
     last_hash = ''
     if hash_file.is_file():
         last_hash = hash_file.read_text()
