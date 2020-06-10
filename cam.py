@@ -128,7 +128,7 @@ def add_to_cloud(_path: str):
     _cloud_path = 'cloud-mailru:/autocam_imgs' if not is_debug else 'cloud-mailru:/autocam_imgs_test'
     subprocess.run(['rclone', 'move', _path, _cloud_path, '--include', '*.jpg', '--max-transfer', '200M'])
 
-def main(_send_msg: bool = False, _cloud_only: bool = False, _cloud_sync: bool = False):
+def main(_send_msg: bool = False, _cloud_only: bool = False, _cloud_sync: bool = False, _nopush: bool = False):
     global is_debug
     if is_debug:
         print('Run in debug mode.')
@@ -138,7 +138,8 @@ def main(_send_msg: bool = False, _cloud_only: bool = False, _cloud_sync: bool =
         if not cam_pwr_on():
             print('Error. Camera is power-on in manual mode.')
             exit(1)
-        cam_push_btn()
+        if not _nopush:
+            cam_push_btn()
         cam_disc_mount()
 
         mnt = False
@@ -182,4 +183,4 @@ if __name__ == "__main__":
         main(_send_msg = send, _cloud_only = cloud_only, _cloud_sync = cloud)
     else:
         params = sys.argv[1:]
-        main(params.count('--send') > 0, params.count('--cloud') > 0, params.count('--sync') > 0)
+        main(params.count('--send') > 0, params.count('--cloud') > 0, params.count('--sync') > 0, params.count('--nopush') > 0)
