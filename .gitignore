@@ -3,3 +3,5 @@ debug
 dbg_files/
 .vscode
 __pycache__
+*MSDCF/
+hash

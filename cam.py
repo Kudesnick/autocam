@@ -75,6 +75,7 @@ def delete_file(_path: Path):
     _path.rename(_path.with_suffix('.jpg'))
 
 def files_first_rename(_path: str, _cloud_only: bool):
+    # diffefnt case of suffix not working in windows system!
     new_files = [name for name in Path(_path).glob('*.JPG')]
     suffix = '.jpg' if _cloud_only else '.jpeg'
     if (len(new_files) == 1):
@@ -125,7 +126,7 @@ def add_path_to_vk(_path: str, _send: bool):
 
 def add_to_cloud(_path: str):
     _cloud_path = 'cloud-mailru:/autocam_imgs' if not is_debug else 'cloud-mailru:/autocam_imgs_test'
-    subprocess.run(['rclone', 'move', _path, 'cloud-mailru:/autocam_imgs', '--include *.jpg', '--max-transfer 200M'])
+    subprocess.run(['rclone', 'move', _path, _cloud_path, '--include', '*.jpg', '--max-transfer', '200M'])
 
 def main(_send_msg: bool = False, _cloud_only: bool = False, _cloud_sync: bool = False):
     global is_debug
@@ -145,7 +146,7 @@ def main(_send_msg: bool = False, _cloud_only: bool = False, _cloud_sync: bool =
             r_path = '/media/DCIM/{}MSDCF'.format(str(i))
             if is_debug:
                 print('Real img path: {}'.format(r_path))
-            img_path = r_path if not is_debug else 'dbg_files'
+            img_path = '/media/DCIM/{}MSDCF'.format(str(i)) if not is_debug else '{}MSDCF'.format(str(i))
 
             if not mnt:
                 for _ in range(3):
@@ -167,7 +168,6 @@ def main(_send_msg: bool = False, _cloud_only: bool = False, _cloud_sync: bool =
             if _cloud_sync:
                 add_to_cloud(img_path)
 
-            if is_debug: break
     finally:
         cam_disc_umount()
         cam_pwr_off()
@@ -176,8 +176,10 @@ def main(_send_msg: bool = False, _cloud_only: bool = False, _cloud_sync: bool =
 
 if __name__ == "__main__":
     if is_debug:
-        send = input('Send files to server? (y/n): ') == 'y'
-        main(send)
+        send = input('Send files to VK server? (y/n): ') == 'y'
+        cloud_only = input('Convert to cloud only? (y/n): ') == 'y'
+        cloud = input('Send files to cloud server? (y/n): ') == 'y'
+        main(_send_msg = send, _cloud_only = cloud_only, _cloud_sync = cloud)
     else:
         params = sys.argv[1:]
         main(params.count('--send') > 0, params.count('--cloud') > 0, params.count('--sync') > 0)
