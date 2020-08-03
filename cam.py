@@ -126,7 +126,9 @@ def add_path_to_vk(_path: str, _send: bool):
 
 def add_to_cloud(_path: str):
     _cloud_path = 'cloud-mailru:/autocam_imgs' if not is_debug else 'cloud-mailru:/autocam_imgs_test'
-    subprocess.run(['rclone', 'move', _path, _cloud_path, '--include', '*.jpg', '--max-transfer', '200M'])
+    for _ in range(10):
+        if subprocess.run(['rclone', 'move', _path, _cloud_path, '--include', '*.jpg', '--max-transfer', '200M']) == 0:
+            return
 
 def main(_send_msg: bool = False, _cloud_only: bool = False, _cloud_sync: bool = False, _nopush: bool = False):
     global is_debug
