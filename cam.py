@@ -71,7 +71,8 @@ def cam_disc_umount():
         return
     GPIO.setup(usb_pwr, GPIO.IN)
 
-def delete_file(_path: Path):
+def delete_file(_path):
+    _path = Path(_path)
     _path.rename(_path.with_suffix('.jpg'))
 
 def files_first_rename(_path: str, _cloud_only: bool):
@@ -120,8 +121,9 @@ def add_path_to_vk(_path: str, _send: bool):
                 files.remove(f[1])
 
         print('Send to server..')
+        files = [str(name) for name in Path(_path).glob('*.jpeg')]
         vk.main(files)
-        for name in Path(_path).glob('*.jpeg'):
+        for name in files:
             delete_file(name)
 
 def add_to_cloud(_path: str):

@@ -22,7 +22,7 @@ After=bluetooth.service
 Requires=bluetooth.service
 
 [Service]
-ExecStart=/usr/bin/rfcomm watch hci0 1 getty rfcomm0 115200 vt100 -a pi
+ExecStart=/usr/bin/rfcomm watch hci0 1 getty rfcomm0 115200 vt100
 
 [Install]
 WantedBy=multi-user.target
