@@ -37,7 +37,9 @@ def main(_files: list):
 
     for i in range(0, len(_files), 9): # 10 - VK limit on post attachments
 
-        photo_list = upload.photo_wall(_files[i : i + 9])
+        photo_list = []
+        for j in range(i, i + len(_files[i : i + 9])):
+            photo_list.extend(upload.photo_wall(_files[j]))
         attachment = ','.join('photo{owner_id}_{id}'.format(**item) for item in photo_list)
 
         result = vk.wall.post(
